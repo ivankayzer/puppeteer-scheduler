@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import disrequire from "disrequire";
 import Redis from "./redis";
+import Logger from './logger';
 
 import run from "./run";
 
@@ -15,7 +16,7 @@ let files = [];
   const fs = require("fs");
   await redis.connect();
 
-  const directoryPath = __dirname + "/scripts";
+  const directoryPath = __dirname + "/../scripts";
 
   let running: string[] = [];
 
@@ -25,22 +26,22 @@ let files = [];
         .readdirSync(directoryPath)
         .filter((file: string) => file.endsWith(".js"));
 
-      console.log(`Found ${files.length} files in directory ${directoryPath}`);
-      console.log(files);
+      Logger.debug(`Found ${files.length} tasks in directory ${directoryPath}`);
+      Logger.debug(files);
 
       files.forEach(async (file: string) => {
         const path = directoryPath + "/" + file;
         const script = require(path);
 
         if (!script.frequency) {
-          console.warn(`${path} has an empty frequency field, skipping...`);
+          Logger.warning(`${path} has an empty frequency field, skipping...`);
           return;
         }
 
-        const lastRunKey = `lastRunAt:${script.id}`;
+        const lastRunKey = `lastRunAt:${path}`;
 
         const lastRunAt = await redis.get(lastRunKey);
-        const isRunning = running.includes(script.id);
+        const isRunning = running.includes(path);
 
         if (isRunning) {
           return;
@@ -50,16 +51,16 @@ let files = [];
           !lastRunAt ||
           nowInSeconds() > Number(lastRunAt) + script.frequency
         ) {
-          console.log(`Running ${JSON.stringify(script)}`);
+          Logger.debug(`Running ${JSON.stringify(script)}`);
           try {
-            running.push(script.id);
+            running.push(path);
             await run(script, process.argv.includes("--debug"));
           } catch (e) {
-            running = running.filter((s) => s !== script.id);
+            running = running.filter((s) => s !== path);
             throw e;
           }
-          console.log("Finished running");
-          running = running.filter((s) => s !== script.id);
+          Logger.debug("Finished running");
+          running = running.filter((s) => s !== path);
           await redis.set(lastRunKey, nowInSeconds(), 3600 * 24 * 7);
         }
 
@@ -77,12 +78,12 @@ let files = [];
 })();
 
 const gracefulShutdown = async (e: Error) => {
-  console.error(e);
+  Logger.error(e.message);
   if (process.argv.includes("--no-fail")) {
     return;
   }
   await redis.quit();
-  console.log("graceful shutdown");
+  Logger.debug("graceful shutdown");
   process.exit(0);
 };
 

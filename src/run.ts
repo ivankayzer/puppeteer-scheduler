@@ -2,15 +2,17 @@ import puppeteer from "puppeteer";
 import md5 from "md5";
 import tg from "node-telegram-bot-api";
 import Redis from "./redis";
-import chats from "./scripts/helpers/chats";
-import Browser from './browser';
+import chats from "./helpers/chats";
+import Browser from "./browser";
+import Logger from "./logger";
 
 const redis = new Redis();
 
-const filterAsync = async function (array: Array<any>, callback: (v: any, i: number) => {}) {
-  const results = await Promise.all(
-    array.map((v, i) => callback(v, i))
-  );
+const filterAsync = async function (
+  array: Array<any>,
+  callback: (v: any, i: number) => {}
+) {
+  const results = await Promise.all(array.map((v, i) => callback(v, i)));
   return array.filter((_, i) => results[i]);
 };
 
@@ -32,9 +34,9 @@ const run = async (
     }
 
     if (isArrayOfObjects(result)) {
-      result = await filterAsync(result, async item => {
+      result = await filterAsync(result, async (item) => {
         const id = item.id ? item.id : JSON.stringify(item);
-        
+
         if (debug) {
           return true;
         }
@@ -44,7 +46,7 @@ const run = async (
         return !inSet;
       });
 
-      console.log(result);
+      Logger.debug(result);
 
       if (!result.length) {
         return null;
@@ -75,25 +77,25 @@ const run = async (
     return result;
   };
 
-// const browser = await Browser.browserless(puppeteer);
-const browser = await Browser.macOSChrome(puppeteer);
+  // const browser = await Browser.browserless(puppeteer);
+  const browser = await Browser.macOSChrome(puppeteer);
 
   const page = await browser.newPage();
   let result = null;
   try {
-    result = await script({ page });
+    result = await script(page);
   } catch (e) {
     await browser.close();
     throw e;
   }
 
-  console.log("Finished with result:");
-  console.log(JSON.stringify(result));
+  Logger.debug("Finished with result:");
+  Logger.debug(result);
 
   try {
     await browser.close();
-  } catch (e) {
-    console.log(e);
+  } catch (e: any) {
+    Logger.error(e);
   }
 
   try {
@@ -108,7 +110,7 @@ const browser = await Browser.macOSChrome(puppeteer);
       );
     }
   } catch (e) {
-    console.log("failed reporting error");
+    Logger.error("failed reporting error");
   }
 
   try {
@@ -140,8 +142,8 @@ const browser = await Browser.macOSChrome(puppeteer);
         await new Promise((r) => setTimeout(r, 1000));
       }
     }
-  } catch (e) {
-    console.log(e);
+  } catch (e: any) {
+    Logger.error(e);
   }
 };
 

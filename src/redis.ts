@@ -1,4 +1,5 @@
 import { createClient, RedisClientType } from "redis";
+import Logger from './logger';
 
 class Redis {
   private redis: RedisClientType;
@@ -12,7 +13,7 @@ class Redis {
     });
 
     this.redis.on("error", (error) => {
-      console.error(`Redis error: ${error}`);
+      Logger.error(`Redis error: ${error}`);
     });
   }
 
