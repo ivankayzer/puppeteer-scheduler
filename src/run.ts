@@ -1,11 +1,10 @@
 import puppeteer from "puppeteer";
 import md5 from "md5";
 import tg from "node-telegram-bot-api";
-import Redis from "./redis";
-import chats from "./helpers/chats";
+import chats from "../scripts/config/chats";
 import Browser from "./browser";
 import Logger from "./logger";
-import { printTable } from 'console-table-printer';
+import Redis from "./redis";
 
 const redis = new Redis();
 
@@ -68,11 +67,11 @@ const run = async (
 
     if (!debug) {
       const md5OfResult = md5(JSON.stringify(result));
-      const latest = await redis.getLatestFromList(key);
+      const latest = await cache.getLatestFromList(key);
       if (latest && latest === md5OfResult) {
         return null;
       }
-      await redis.pushToList(key, md5OfResult, 3600 * 24 * 31);
+      await cache.pushToList(key, md5OfResult, 3600 * 24 * 31);
     }
 
     return result;

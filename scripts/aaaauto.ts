@@ -1,8 +1,8 @@
 import { Page } from "puppeteer";
 
-import Helpers from "../src/helpers/helpers";
-import chats from "../src/helpers/chats";
-import Frequency from "../src/helpers/frequency";
+import Helpers from "./config/helpers";
+import chats from "./config/chats";
+import Frequency from "./config/frequency";
 
 const url =
   "https://www.aaaauto.pl/benzin/#!&make[]=74&make[]=87&make[]=130&model[]=1207&model[]=36613&model[]=1826&model[]=844&palivo=1&transmission=A&pmax=70000";

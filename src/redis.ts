@@ -17,38 +17,38 @@ class Redis {
     });
   }
 
-  pushToSet = async (key: string, value: string, ttl: number) => {
+  async pushToSet(key: string, value: string, ttl: number) {
     await this.redis.sAdd(key, value);
     await this.redis.expire(key, ttl);
   };
 
-  isInSet = async (key: string, member: string) => {
+  async isInSet(key: string, member: string) {
     return await this.redis.sIsMember(key, member);
   };
 
-  pushToList = async (key: string, value: string, ttl: number) => {
+  async pushToList(key: string, value: string, ttl: number) {
     await this.redis.lPush(key, value);
     await this.redis.expire(key, ttl);
   };
 
-  getLatestFromList = async (key: string) => {
+  async getLatestFromList(key: string) {
     const value = await this.redis.lRange(key, 0, 0);
     return value[0];
   };
 
-  set = async (key: string, value: string|number, ttl: number) => {
+  async set(key: string, value: string|number, ttl: number) {
     await this.redis.set(key, value, { EX: ttl });
   };
 
-  get = async (key: string) => {
+  async get(key: string) {
     return await this.redis.get(key);
   };
 
-  connect = async () => {
+  async connect() {
     return await this.redis.connect();
   };
 
-  quit = async () => {
+  async closeConnection() {
     return await this.redis.quit();
   };
 }

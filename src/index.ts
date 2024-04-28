@@ -3,8 +3,6 @@ import disrequire from "disrequire";
 import Redis from "./redis";
 import Logger from './logger';
 
-import { printTable } from 'console-table-printer';
-
 import run from "./run";
 
 dotenv.config();
@@ -29,7 +27,7 @@ let files = [];
         .filter((file: string) => file.endsWith(".js"));
 
       Logger.debug(`Found ${files.length} tasks in directory ${directoryPath}`);
-      printTable(files);
+      console.table(files);
 
       files.forEach(async (file: string) => {
         const path = directoryPath + "/" + file;
@@ -84,7 +82,7 @@ const gracefulShutdown = async (e: Error) => {
   if (process.argv.includes("--no-fail")) {
     return;
   }
-  await redis.quit();
+  await redis.closeConnection();
   Logger.debug("graceful shutdown");
   process.exit(0);
 };
