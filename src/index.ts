@@ -3,6 +3,8 @@ import disrequire from "disrequire";
 import Redis from "./redis";
 import Logger from './logger';
 
+import { printTable } from 'console-table-printer';
+
 import run from "./run";
 
 dotenv.config();
@@ -27,7 +29,7 @@ let files = [];
         .filter((file: string) => file.endsWith(".js"));
 
       Logger.debug(`Found ${files.length} tasks in directory ${directoryPath}`);
-      Logger.debug(files);
+      printTable(files);
 
       files.forEach(async (file: string) => {
         const path = directoryPath + "/" + file;

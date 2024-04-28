@@ -5,6 +5,7 @@ import Redis from "./redis";
 import chats from "./helpers/chats";
 import Browser from "./browser";
 import Logger from "./logger";
+import { printTable } from 'console-table-printer';
 
 const redis = new Redis();
 
@@ -90,7 +91,7 @@ const run = async (
   }
 
   Logger.debug("Finished with result:");
-  Logger.debug(result);
+  printTable(result);
 
   try {
     await browser.close();
