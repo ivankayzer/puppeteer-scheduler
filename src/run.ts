@@ -5,6 +5,7 @@ import chats from "../scripts/config/chats";
 import Browser from "./browser";
 import Logger from "./logger";
 import Redis from "./redis";
+import Helpers from "../scripts/config/helpers";
 
 const filterAsync = async function (
   array: Array<any>,
@@ -17,7 +18,8 @@ const filterAsync = async function (
 const Run = async (
   { script, name, id, chatId, alertIf = () => {} }: any,
   debug = false,
-  send = true
+  send = true,
+  detached = false,
 ) => {
   const redis = await Redis.getInstance();
 
@@ -76,27 +78,6 @@ const Run = async (
 
     return result;
   };
-
-  // const browser = await Browser.browserless(puppeteer);
-  const browser = await Browser.macOSChrome(puppeteer);
-
-  const page = await browser.newPage();
-  let result = null;
-  try {
-    result = await script(page);
-  } catch (e) {
-    await browser.close();
-    throw e;
-  }
-
-  Logger.debug("Finished with result:");
-  console.table(result);
-
-  try {
-    await browser.close();
-  } catch (e: any) {
-    Logger.error(e);
-  }
 
   try {
     if (alertIf(result)) {
