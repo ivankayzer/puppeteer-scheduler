@@ -2,55 +2,65 @@ import { createClient, RedisClientType } from "redis";
 import Logger from './logger';
 
 class Redis {
-  private redis: RedisClientType;
+  private client: RedisClientType;
+  private static instance: Redis;
 
-  constructor() {
-    this.redis = createClient({
+  private constructor() {
+    this.client = createClient({
       socket: {
         host: process.env.REDIS_HOST || "localhost",
       },
       password: process.env.REDIS_PASS,
     });
 
-    this.redis.on("error", (error) => {
+    this.client.on("error", (error) => {
       Logger.error(`Redis error: ${error}`);
     });
   }
 
-  async pushToSet(key: string, value: string, ttl: number) {
-    await this.redis.sAdd(key, value);
-    await this.redis.expire(key, ttl);
+  public async pushToSet(key: string, value: string, ttl: number) {
+    await this.client.sAdd(key, value);
+    await this.client.expire(key, ttl);
   };
 
-  async isInSet(key: string, member: string) {
-    return await this.redis.sIsMember(key, member);
+  public async isInSet(key: string, member: string) {
+    return await this.client.sIsMember(key, member);
   };
 
-  async pushToList(key: string, value: string, ttl: number) {
-    await this.redis.lPush(key, value);
-    await this.redis.expire(key, ttl);
+  public async pushToList(key: string, value: string, ttl: number) {
+    await this.client.lPush(key, value);
+    await this.client.expire(key, ttl);
   };
 
-  async getLatestFromList(key: string) {
-    const value = await this.redis.lRange(key, 0, 0);
+  public async getLatestFromList(key: string) {
+    const value = await this.client.lRange(key, 0, 0);
     return value[0];
   };
 
-  async set(key: string, value: string|number, ttl: number) {
-    await this.redis.set(key, value, { EX: ttl });
+  public async set(key: string, value: string|number, ttl: number) {
+    await this.client.set(key, value, { EX: ttl });
   };
 
-  async get(key: string) {
-    return await this.redis.get(key);
+  public async get(key: string) {
+    return await this.client.get(key);
   };
 
-  async connect() {
-    return await this.redis.connect();
+  public async connect() {
+    return await this.client.connect();
   };
 
-  async closeConnection() {
-    return await this.redis.quit();
+  public async closeConnection() {
+    return await this.client.quit();
   };
+
+  public static async getInstance() {
+    if (!Redis.instance) {
+      Redis.instance = new Redis();
+      await Redis.instance.connect();
+    }
+
+    return Redis.instance;
+  }
 }
 
 export default Redis;

@@ -12,10 +12,9 @@
   "dependencies": {
     "@ptkdev/logger": "^1.8.0",
     "disrequire": "^1.1.4",
-    "dotenv": "^16.4.5",
     "md5": "^2.3.0",
     "node-telegram-bot-api": "^0.65.1",
-    "puppeteer": "^22.7.1",
+    "puppeteer": "^22.9.0",
     "redis": "^4.6.13"
   }
 }

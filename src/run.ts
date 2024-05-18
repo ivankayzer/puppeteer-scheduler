@@ -6,8 +6,6 @@ import Browser from "./browser";
 import Logger from "./logger";
 import Redis from "./redis";
 
-const redis = new Redis();
-
 const filterAsync = async function (
   array: Array<any>,
   callback: (v: any, i: number) => {}
@@ -16,11 +14,13 @@ const filterAsync = async function (
   return array.filter((_, i) => results[i]);
 };
 
-const run = async (
+const Run = async (
   { script, name, id, chatId, alertIf = () => {} }: any,
   debug = false,
   send = true
 ) => {
+  const redis = await Redis.getInstance();
+
   const isArrayOfObjects = (result: any) =>
     Array.isArray(result) && result.length && typeof result[0] === "object";
 
@@ -67,11 +67,11 @@ const run = async (
 
     if (!debug) {
       const md5OfResult = md5(JSON.stringify(result));
-      const latest = await cache.getLatestFromList(key);
+      const latest = await redis.getLatestFromList(key);
       if (latest && latest === md5OfResult) {
         return null;
       }
-      await cache.pushToList(key, md5OfResult, 3600 * 24 * 31);
+      await redis.pushToList(key, md5OfResult, 3600 * 24 * 31);
     }
 
     return result;
@@ -90,7 +90,7 @@ const run = async (
   }
 
   Logger.debug("Finished with result:");
-  printTable(result);
+  console.table(result);
 
   try {
     await browser.close();
@@ -152,4 +152,4 @@ const format = (message: any) =>
     ? JSON.stringify(message, null, 2).replace(/[\[\]{}"]/g, "")
     : message;
 
-export default run;
+export default Run;
