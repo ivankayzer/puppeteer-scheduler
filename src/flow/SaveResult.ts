@@ -1,10 +1,12 @@
 import md5 from "md5";
 import Logger from "../logger";
 import Redis from "../redis";
+import { Config } from "../config";
 
 class SaveResult {
-    public static async from({id}: any, result: any, config: any): Promise<any> {
+    public static async from({id, lastRunKey}: any, result: any, config: Config): Promise<any> {
         const key = `history:${id}`;
+        const nowInSeconds = () => Math.floor(Date.now() / 1000);
         const redis = await Redis.getInstance();
         const isArrayOfObjects = (result: any) => Array.isArray(result) && result.length && typeof result[0] === "object";
         const isEmptyArray = (result: any) => Array.isArray(result) && !result.length;
@@ -16,6 +18,8 @@ class SaveResult {
             const results = await Promise.all(array.map((v, i) => callback(v, i)));
             return array.filter((_, i) => results[i]);
         };
+
+        await redis.set(lastRunKey, nowInSeconds(), 3600 * 24 * 7);
 
         if (isEmptyArray(result)) {
             return;

@@ -1,24 +1,14 @@
-import fs from "fs";
 import Logger from "../logger";
-import disrequire from "disrequire";
 import Browser from "../browser";
 import puppeteer from "puppeteer";
 import Helpers from "../../scripts/config/helpers";
-import Redis from "../redis";
 
 class Run {
-    public static async from({
-                                 script, name, id, chatId, lastRunKey, alertIf = () => {
-        }
-                             }: any): Promise<any> {
-        const nowInSeconds = () => Math.floor(Date.now() / 1000);
-
-        const redis = await Redis.getInstance();
-
+    public static async from({script, name, lastRunKey}: any): Promise<any> {
         // const browser = await Browser.browserless(puppeteer);
         const browser = await Browser.macOSChrome(puppeteer);
 
-        Logger.debug(`Running ${JSON.stringify(script)}`);
+        Logger.debug(`Running ${JSON.stringify(name)}`);
         const page = await browser.newPage();
         let result = null;
         try {
@@ -38,8 +28,6 @@ class Run {
         }
 
         Logger.debug("Finished running");
-
-        await redis.set(lastRunKey, nowInSeconds(), 3600 * 24 * 7);
 
         return result;
     }

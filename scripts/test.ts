@@ -15,8 +15,7 @@ const script = async (page: Page, helpers: Helpers) => {
 };
 
 module.exports = {
-  script: new Function(`
-    return async function run(page, helpers) {}`)(),
+  script: script,
   name: "test",
   chatId: chats.DEFAULT,
   frequency: 1,

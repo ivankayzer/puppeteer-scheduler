@@ -2,9 +2,10 @@ import md5 from "md5";
 import Logger from "../logger";
 import tg from "node-telegram-bot-api";
 import chats from "../../scripts/config/chats";
+import {Config} from "../config";
 
 class SendResult {
-    public static async from({name, chatId, alertIf = () => {}}: any, result: any, config: any): Promise<void> {
+    public static async from({name, chatId, alertIf = () => {}}: any, result: any, config: Config): Promise<void> {
 
         const isArrayOfObjects = (result: any) =>
             Array.isArray(result) && result.length && typeof result[0] === "object";

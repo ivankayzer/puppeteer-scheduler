@@ -12,7 +12,6 @@ const hasRuntimeFlag = (flag: string) => process.argv.includes(`--${flag}`);
 (async () => {
     const config = Config(hasRuntimeFlag('debug'));
 
-
     while (true) {
         const files = Scan.from(`${__dirname}/../scripts/`);
         const scripts = await Load.from(files);

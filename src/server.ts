@@ -20,7 +20,10 @@ app.use((req, res, next) => {
 });
 
 app.post('/run-once', async (req, res) => {
-    const script = {script: new Function(`return async function run(page, helpers) { ${req.body.script} }`)()};
+    const script = {
+        name: req.body.name || 'one-time',
+        script: new Function(`return async function run(page, helpers) { ${req.body.script} }`)()
+    };
     const result = await Run.from(script);
     res.send({result});
 });
