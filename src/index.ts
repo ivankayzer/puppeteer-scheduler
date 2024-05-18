@@ -1,37 +1,27 @@
 import Redis from "./redis";
 import Logger from './logger';
-import Scheduler from "./scheduler";
-import fs from "fs";
-import Run from "./run";
-import disrequire from "disrequire";
-import Context from "./context";
-import context from "./context";
+import Config from "./config";
+import Scan from "./flow/Scan";
+import Run from "./flow/Run";
+import Load from "./flow/Load";
+import SaveResult from "./flow/SaveResult";
+import SendResult from "./flow/SendResult";
 
 const hasRuntimeFlag = (flag: string) => process.argv.includes(`--${flag}`);
 
 (async () => {
-    const scheduler = new Scheduler(hasRuntimeFlag('debug'));
+    const config = Config(hasRuntimeFlag('debug'));
 
-    // Logger.debug(`Running ${JSON.stringify(script)}`);
-    // try {
-    //     this.running.push(path);
-    //     await Run(script);
-    // } catch (e) {
-    //     this.running = this.running.filter((s) => s !== path);
-    //     throw e;
-    // }
-    // Logger.debug("Finished running");
-    // this.running = this.running.filter((s) => s !== path);
-    // await this.redis.set(lastRunKey, nowInSeconds(), 3600 * 24 * 7);
 
     while (true) {
-        const context = await Context.CreateForScheduler(scheduler, await Redis.getInstance())
-            .Scan(`${__dirname}/../scripts/`)
-            .Load();
+        const files = Scan.from(`${__dirname}/../scripts/`);
+        const scripts = await Load.from(files);
 
-        context.GetQueue().map(
-            script => context.Run(script).then(context => context.SaveResult())
-        );
+        for (const script of scripts) {
+            const result = await Run.from(script);
+            const savedResult = await SaveResult.from(script, result, config);
+            await SendResult.from(script, savedResult, config);
+        }
 
         await new Promise((r) => setTimeout(r, 1000));
     }

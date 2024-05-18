@@ -2,10 +2,7 @@ import express from 'express'
 import bodyParser from 'body-parser'
 import yaml from 'js-yaml';
 
-import Run from './run';
-import Helpers from "../scripts/config/helpers";
-import Context from "./context";
-import Redis from "./redis";
+import Run from './flow/Run';
 
 const app = express()
 
@@ -22,13 +19,9 @@ app.use((req, res, next) => {
     next();
 });
 
-app.post('/run', async (req, res) => {
+app.post('/run-once', async (req, res) => {
     const script = {script: new Function(`return async function run(page, helpers) { ${req.body.script} }`)()};
-
-    const result = await Context.CreateForHttp(await Redis.getInstance())
-        .Run(script)
-        .then(context => context.ReturnResult())
-
+    const result = await Run.from(script);
     res.send({result});
 });
 

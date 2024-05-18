@@ -1,0 +1,1 @@
+export default (debug = false, send = true) => ({ debug, send });
