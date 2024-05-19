@@ -1,8 +1,8 @@
 interface IConfig {
   debug: boolean;
-  send: boolean;
+  chatId?: string;
   noFail: boolean;
-  browser: "macChrome" | "browserless";
+  browser: "localChrome" | "browserless";
   statusBotTelegramToken?: string;
   botTelegramToken?: string;
   redisHost?: string;
@@ -14,8 +14,8 @@ class Config {
   public static create(): IConfig {
     return <IConfig>{
       debug: this.hasRuntimeFlag("debug"),
-      send: !this.hasRuntimeFlag("no-send"),
-      noFail: this.hasRuntimeFlag("no-fail"),
+      chatId: this.getRuntimeFlag("chatId") || process.env.CHAT_ID,
+      noFail: this.hasRuntimeFlag("noFail"),
       browser: this.getRuntimeFlag("browser") || "browserless",
       statusBotTelegramToken:
         this.getRuntimeFlag("statusBotTelegramToken") ||

@@ -1,6 +1,5 @@
 import Logger from "../lib/logger";
 import tg from "node-telegram-bot-api";
-import chats from "../../scripts/config/chats";
 import { IConfig } from "../config";
 import { isArrayOfObjects, isEmptyArray } from "../lib/helpers";
 import { Script } from "../types/script";
@@ -13,15 +12,15 @@ const format = (message: any) =>
 
 class Send {
   public static async from(
-    { name, alertIf, chatId }: Script,
+    { name, alertIf }: Script,
     result: typeof Result,
     config: IConfig,
   ): Promise<void> {
     try {
-      if (alertIf && alertIf(result)) {
-        const statusBot = new tg(process.env.STATUS_BOT_TOKEN || "");
+      if (alertIf && alertIf(result) && config.chatId) {
+        const statusBot = new tg(config.statusBotTelegramToken || "");
         await statusBot.sendMessage(
-          chats.DEFAULT,
+          config.chatId,
           `<b>${name}</b>` + "\nProblem occurred during script execution\n",
           {
             parse_mode: "HTML",
@@ -33,8 +32,8 @@ class Send {
     }
 
     try {
-      if (result !== null && !isEmptyArray(result) && chatId && config.send) {
-        const bot = new tg(process.env.BOT_TOKEN || "");
+      if (result !== null && !isEmptyArray(result) && config.chatId) {
+        const bot = new tg(config.botTelegramToken || "");
 
         const messages = [];
 
@@ -49,7 +48,7 @@ class Send {
 
         for (let i = 0; i < messages.length; i++) {
           await bot.sendMessage(
-            chatId,
+            config.chatId,
             `<b>${name}</b>` + "\n" + messages[i] + "\n",
             {
               parse_mode: "HTML",

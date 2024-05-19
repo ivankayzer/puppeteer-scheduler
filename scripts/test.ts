@@ -1,16 +1,13 @@
-import { Page } from "puppeteer";
+// @ts-nocheck
 
+import { Page } from "puppeteer";
 import Helpers from "./config/helpers";
-import chats from "./config/chats";
 import Frequency from "./config/frequency";
 
 const script = async (page: Page, helpers: Helpers) => {
   await page.goto("https://coinmarketcap.com/currencies/toncoin/");
-  // @ts-ignore
   await helpers.setViewport(page);
-  // @ts-ignore
   await helpers.wait(5000);
-  // @ts-ignore
   return await page.evaluate(
     () =>
       document
@@ -22,6 +19,5 @@ const script = async (page: Page, helpers: Helpers) => {
 module.exports = {
   script: script,
   name: "test",
-  chatId: chats.DEFAULT,
-  frequency: 1,
+  frequency: Frequency.seconds(1),
 };

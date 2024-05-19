@@ -19,7 +19,7 @@ class Browser {
 
   static fromConfig = async (config: IConfig, puppeteer: PuppeteerNode) => {
     switch (config.browser) {
-      case "macChrome":
+      case "localChrome":
         return await this.macOSChrome(config, puppeteer);
       case "browserless":
         return await this.browserless(config, puppeteer);
