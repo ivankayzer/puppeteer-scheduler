@@ -1,1 +1,4 @@
-declare module 'disrequire';
+declare module "disrequire" {
+  function disrequire(path: string): void;
+  export = disrequire;
+}
