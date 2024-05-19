@@ -10,7 +10,7 @@ const config = Config.create();
 
 (async () => {
   while (true) {
-    for (const script of await Load.from(`${__dirname}/../scripts/`, config)) {
+    for (const script of await Load.from(config.scriptPath, config)) {
       await Run.from(script, config)
         .then((result) => Save.from(script, result, config))
         .then((result) => Send.from(script, result, config));

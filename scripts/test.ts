@@ -2,7 +2,6 @@
 
 import { Page } from "puppeteer";
 import Helpers from "./config/helpers";
-import Frequency from "./config/frequency";
 
 const script = async (page: Page, helpers: Helpers) => {
   await page.goto("https://coinmarketcap.com/currencies/toncoin/");
@@ -19,5 +18,5 @@ const script = async (page: Page, helpers: Helpers) => {
 module.exports = {
   script: script,
   name: "test",
-  frequency: Frequency.seconds(1),
+  frequency: 1,
 };
