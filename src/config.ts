@@ -18,10 +18,10 @@ class Config {
       noFail: this.hasRuntimeFlag("noFail"),
       browser: this.getRuntimeFlag("browser") || "browserless",
       statusBotTelegramToken:
-        this.getRuntimeFlag("statusBotTelegramToken") ||
+        this.getRuntimeFlag("telegramStatusBotToken") ||
         process.env.STATUS_BOT_TOKEN,
       botTelegramToken:
-        this.getRuntimeFlag("botTelegramToken") || process.env.BOT_TOKEN,
+        this.getRuntimeFlag("telegramBotToken") || process.env.BOT_TOKEN,
       redisHost:
         this.getRuntimeFlag("redisHost") ||
         process.env.REDIS_HOST ||
