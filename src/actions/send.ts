@@ -11,7 +11,7 @@ const format = (message: any) =>
     ? JSON.stringify(message, null, 2).replace(/[\[\]{}"]/g, "")
     : message;
 
-class SendResult {
+class Send {
   public static async from(
     { name, alertIf, chatId }: Script,
     result: typeof Result,
@@ -65,4 +65,4 @@ class SendResult {
   }
 }
 
-export default SendResult;
+export default Send;

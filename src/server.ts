@@ -2,7 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import yaml from "js-yaml";
 
-import Run from "./actions/Run";
+import Run from "./actions/run";
 import Config from "./config";
 import { Script } from "./types/script";
 

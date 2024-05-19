@@ -8,7 +8,6 @@ interface Script {
   chatId?: number;
   frequency?: number;
   alertIf?: (result: Result) => boolean;
-  lastRunKey?: string;
 }
 
 export { Script };

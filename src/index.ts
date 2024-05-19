@@ -1,10 +1,10 @@
 import Redis from "./lib/redis";
 import Logger from "./lib/logger";
 import Config from "./config";
-import Run from "./actions/Run";
-import Load from "./actions/Load";
-import SaveResult from "./actions/SaveResult";
-import SendResult from "./actions/SendResult";
+import Run from "./actions/run";
+import Load from "./actions/load";
+import Save from "./actions/save";
+import Send from "./actions/send";
 
 const config = Config.create();
 
@@ -12,8 +12,8 @@ const config = Config.create();
   while (true) {
     for (const script of await Load.from(`${__dirname}/../scripts/`, config)) {
       Run.from(script, config)
-        .then((result) => SaveResult.from(script, result, config))
-        .then((result) => SendResult.from(script, result, config));
+        .then((result) => Save.from(script, result, config))
+        .then((result) => Send.from(script, result, config));
     }
 
     await new Promise((r) => setTimeout(r, 1000));

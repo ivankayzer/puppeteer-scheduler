@@ -11,7 +11,7 @@ import {
 } from "../lib/helpers";
 import Result from "../types/result";
 
-class SaveResult {
+class Save {
   public static async from(
     script: Script,
     result: typeof Result,
@@ -70,4 +70,4 @@ class SaveResult {
   }
 }
 
-export default SaveResult;
+export default Save;
