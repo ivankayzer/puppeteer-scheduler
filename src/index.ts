@@ -6,7 +6,7 @@ import Load from "./actions/load";
 import Save from "./actions/save";
 import Send from "./actions/send";
 
-const config = Config.create();
+const config = Config.createForScheduler();
 
 (async () => {
   while (true) {

@@ -3,17 +3,25 @@ interface IConfig {
   chatId?: string;
   scriptPath: string;
   noFail: boolean;
-  browser: "localChrome" | "browserless";
+  browser: "macOSChrome" | "browserless" | "windowsChrome";
   statusBotTelegramToken?: string;
   botTelegramToken?: string;
   redisHost?: string;
   redisPass?: string;
   browserlessEndpoint?: string;
+
+  isServer(): boolean;
+  isScheduler(): boolean;
 }
 
 class Config {
-  public static create(): IConfig {
+  public static createForServer = (): IConfig => Config.create("server");
+  public static createForScheduler = (): IConfig => Config.create("scheduler");
+
+  private static create(mode: "server" | "scheduler"): IConfig {
     return <IConfig>{
+      isScheduler: () => mode === "scheduler",
+      isServer: () => mode === "server",
       debug: this.hasRuntimeFlag("debug"),
       chatId: this.getRuntimeFlag("chatId") || process.env.CHAT_ID,
       noFail: this.hasRuntimeFlag("noFail"),

@@ -11,7 +11,9 @@
   "scripts": {
     "dev": "tsc --watch",
     "format": "npx prettier . --write",
-    "build": "tsc"
+    "build": "tsc",
+    "server": "node dist/src/server",
+    "scheduler": "node dist/src/index"
   },
   "dependencies": {
     "@ptkdev/logger": "^1.8.0",

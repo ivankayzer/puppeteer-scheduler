@@ -8,7 +8,6 @@ import { IConfig } from "../config";
 
 class Load {
   public static async from(path: string, config: IConfig): Promise<Script[]> {
-    const redis = await Redis.getInstance(config);
 
     const files = fs
       .readdirSync(path)
@@ -24,14 +23,21 @@ class Load {
     for (const path of scripts) {
       const script = require(path);
 
-      if (!script.frequency) {
-        Logger.warning(`${path} has an empty frequency field, skipping...`);
-        continue;
+      if (config.isScheduler()) {
+        if (!script.frequency) {
+          Logger.warning(`${path} has an empty frequency field, skipping...`);
+          continue;
+        }
+  
+        const redis = await Redis.getInstance(config);
+        const lastRunAt = await redis.getLastRunAt(script);
+  
+        if (!lastRunAt || nowInSeconds() > Number(lastRunAt) + script.frequency) {
+          loaded.push(script);
+        }
       }
-
-      const lastRunAt = await redis.getLastRunAt(script);
-
-      if (!lastRunAt || nowInSeconds() > Number(lastRunAt) + script.frequency) {
+      
+      if (config.isServer()) {
         loaded.push(script);
       }
 

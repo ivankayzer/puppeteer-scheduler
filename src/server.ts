@@ -1,10 +1,13 @@
-import express from "express";
+import express, {Request, Response} from "express";
 import bodyParser from "body-parser";
-import yaml from "js-yaml";
+import yaml, { load } from "js-yaml";
 
 import Run from "./actions/run";
 import Config from "./config";
 import { Script } from "./types/script";
+import Load from "./actions/load";
+import Logger from "./lib/logger";
+import logger from "./lib/logger";
 
 const app = express();
 
@@ -21,7 +24,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.post("/run-once", async (req, res) => {
+app.post("/run-once", async (req: Request, res: Response) => {
   const script: Script = {
     name: req.body.name || "one-time",
     script: new Function(
@@ -29,7 +32,25 @@ app.post("/run-once", async (req, res) => {
     )(),
   };
 
-  res.send({ result: await Run.from(script, Config.create()) });
+  res.send({ result: await Run.from(script, Config.createForServer()) });
+});
+
+app.post("/run/:name", async (req, res) => {
+  const config = Config.createForServer();
+
+  const loaded = (await Load.from(config.scriptPath, config)).find(script => script.name === req.params.name);
+  
+  if (!loaded) {
+    logger.warning(`No script found with name: ${req.params.name}.js`);
+    return res.sendStatus(404);
+  }
+
+  const script: Script = {
+    name: loaded.name,
+    script: loaded.script,
+  };
+
+  res.send({ result: await Run.from(script, config) });
 });
 
 app.listen(80);

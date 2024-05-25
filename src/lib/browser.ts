@@ -17,12 +17,25 @@ class Browser {
       headless: false,
     });
 
+  private static windowsChrome = async (
+      config: IConfig,
+      puppeteer: PuppeteerNode,
+    ) =>
+      await puppeteer.launch({
+        executablePath:
+        "C:/Program Files/Google/Chrome/Application/chrome.exe",
+        headless: false,
+      });
+  
+
   static fromConfig = async (config: IConfig, puppeteer: PuppeteerNode) => {
     switch (config.browser) {
-      case "localChrome":
+      case "macOSChrome":
         return await this.macOSChrome(config, puppeteer);
       case "browserless":
         return await this.browserless(config, puppeteer);
+      case "windowsChrome":
+        return await this.windowsChrome(config, puppeteer);
     }
   };
 }
