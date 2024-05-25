@@ -33,7 +33,7 @@ class Load {
         const redis = await Redis.getInstance(config);
         const lastRunAt = await redis.getLastRunAt(script);
   
-        if (!lastRunAt || nowInSeconds() > Number(lastRunAt) + script.frequency) {
+        if (!lastRunAt || nowInSeconds() > (lastRunAt + script.frequency)) {
           loaded.push(script);
         }
       }

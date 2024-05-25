@@ -2,8 +2,20 @@ import { createClient, RedisClientType } from "redis";
 import Logger from "./logger";
 import { Script } from "../types/script";
 import { IConfig } from "../config";
+import RedisFake from "./redis.fake";
 
-class Redis {
+interface IRedis {
+  pushToSet(script: Script, value: string, ttl: number): Promise<void>;
+  isInSet(script: Script, member: string): Promise<boolean>;
+  pushToList(script: Script, value: string, ttl: number): Promise<void>;
+  getLatestFromList(script: Script): Promise<string|null>;
+  setLastRunAt(script: Script, value: number, ttl: number): Promise<void>;
+  getLastRunAt(script: Script): Promise<number|null>;
+  connect(): Promise<void>;
+  closeConnection(): Promise<void>;
+}
+
+class Redis implements IRedis {
   private client: RedisClientType;
   private static instance: Redis;
 
@@ -39,24 +51,26 @@ class Redis {
     return value[0];
   }
 
-  public async setLastRunAt(
-    script: Script,
-    value: string | number,
-    ttl: number,
-  ) {
+  public async setLastRunAt(script: Script, value: number, ttl: number) {
     await this.client.set(this.getLastRunAtKey(script), value, { EX: ttl });
   }
 
   public async getLastRunAt(script: Script) {
-    return await this.client.get(this.getLastRunAtKey(script));
+    const lastRunAt = await this.client.get(this.getLastRunAtKey(script));
+
+    if (lastRunAt === null) {
+      return null;
+    }
+
+    return Number(lastRunAt);
   }
 
   public async connect() {
-    return await this.client.connect();
+    await this.client.connect();
   }
 
   public async closeConnection() {
-    return await this.client.quit();
+    await this.client.quit();
   }
 
   private getLastRunAtKey(script: Script) {
@@ -68,6 +82,10 @@ class Redis {
   }
 
   public static async getInstance(config: IConfig) {
+    if (config.debug) {
+      return new RedisFake;
+    }
+
     if (!Redis.instance) {
       Redis.instance = new Redis(config);
       await Redis.instance.connect();
@@ -78,3 +96,4 @@ class Redis {
 }
 
 export default Redis;
+export { IRedis };

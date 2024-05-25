@@ -17,6 +17,5 @@ const script = async (page: Page, helpers: Helpers) => {
 
 module.exports = {
   script: script,
-  name: "test",
   frequency: 1,
 };

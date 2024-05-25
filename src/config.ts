@@ -25,7 +25,7 @@ class Config {
       debug: this.hasRuntimeFlag("debug"),
       chatId: this.getRuntimeFlag("chatId") || process.env.CHAT_ID,
       noFail: this.hasRuntimeFlag("noFail"),
-      scriptPath: this.getRuntimeFlag("scriptPath") || process.env.SCRIPT_PATH || `${__dirname}/../scripts/`,
+      scriptPath: this.getRuntimeFlag("scriptPath") || process.env.SCRIPT_PATH || `${process.cwd()}/dist/scripts/`,
       browser: this.getRuntimeFlag("browser") || "browserless",
       statusBotTelegramToken:
         this.getRuntimeFlag("telegramStatusBotToken") ||
