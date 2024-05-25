@@ -16,6 +16,10 @@ const config = Config.createForScheduler();
         .then((result) => Send.from(script, result, config));
     }
 
+    if (config.debug) {
+      process.exit(0);
+    }
+    
     await new Promise((r) => setTimeout(r, 1000));
   }
 })();
