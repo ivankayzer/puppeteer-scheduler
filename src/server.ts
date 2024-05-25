@@ -4,10 +4,9 @@ import yaml, { load } from "js-yaml";
 
 import Run from "./actions/run";
 import Config from "./config";
-import { Script } from "./types/script";
 import Load from "./actions/load";
-import Logger from "./lib/logger";
 import logger from "./lib/logger";
+import { Script } from "./types/script";
 
 const app = express();
 
@@ -35,7 +34,7 @@ app.post("/run-once", async (req: Request, res: Response) => {
   res.send({ result: await Run.from(script, Config.createForServer()) });
 });
 
-app.post("/run/:name", async (req, res) => {
+app.post("/run/:name", async (req: Request, res: Response) => {
   const config = Config.createForServer();
 
   const loaded = (await Load.from(config.scriptPath, config)).find(script => script.name === req.params.name);
@@ -51,6 +50,13 @@ app.post("/run/:name", async (req, res) => {
   };
 
   res.send({ result: await Run.from(script, config) });
+});
+
+app.get("/scripts", async (req: Request, res: Response) => {
+  const config = Config.createForServer();
+  const loaded = await Load.from(config.scriptPath, config);
+
+  res.send(loaded.map(({name, frequency})=> ({ name, frequency })));
 });
 
 app.listen(80);

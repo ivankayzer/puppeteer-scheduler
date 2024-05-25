@@ -11,21 +11,22 @@ class Load {
 
     const files = fs
       .readdirSync(path)
-      .filter((file: string) => file.endsWith(".js"));
+      .filter((file: string) => file.endsWith(".script.js"));
 
-    Logger.debug(`Found ${files.length} tasks in directory ${path}`);
-    console.table(files);
+    Logger.debug(`Found ${files.length} scripts in directory ${path}`);
+    console.table(files.map(file => file.replace('.script.js', '')));
 
-    const scripts = files.map((file) => `${path}/${file}`);
+    const loaded: Script[] = [];
 
-    const loaded = [];
+    for (const file of files) {
+      const filePath = `${path}/${file}`;
 
-    for (const path of scripts) {
-      const script = require(path);
+      const script = require(filePath);
+      script.name = file.replace('.script.js', '');
 
       if (config.isScheduler()) {
         if (!script.frequency) {
-          Logger.warning(`${path} has an empty frequency field, skipping...`);
+          Logger.warning(`${filePath} has an empty frequency field, skipping...`);
           continue;
         }
   
@@ -41,7 +42,7 @@ class Load {
         loaded.push(script);
       }
 
-      disrequire(path);
+      disrequire(filePath);
     }
 
     return loaded;
