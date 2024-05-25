@@ -31,7 +31,7 @@ app.post("/run-once", async (req: Request, res: Response) => {
     )(),
   };
 
-  res.send({ result: await Run.from(script, Config.createForServer()) });
+  res.send({ result: await Run.from(script, Config.createForServer(), req.body.args || []) });
 });
 
 app.post("/run/:name", async (req: Request, res: Response) => {
@@ -49,14 +49,14 @@ app.post("/run/:name", async (req: Request, res: Response) => {
     script: loaded.script,
   };
 
-  res.send({ result: await Run.from(script, config) });
+  res.send({ result: await Run.from(script, config, req.body.args || []) });
 });
 
 app.get("/scripts", async (req: Request, res: Response) => {
   const config = Config.createForServer();
   const loaded = await Load.from(config.scriptPath, config);
 
-  res.send(loaded.map(({name, frequency})=> ({ name, frequency })));
+  res.send(loaded.map(({name, frequency, args})=> ({ name, frequency, args })));
 });
 
 app.listen(80);

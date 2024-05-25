@@ -10,6 +10,7 @@ class Run {
   public static async from(
     { script, name }: Script,
     config: IConfig,
+    args: (boolean | number | string)[] = []
   ): Promise<typeof Result> {
     Logger.debug(`Running ${JSON.stringify(name)}`);
 
@@ -18,7 +19,7 @@ class Run {
 
     let result = null;
     try {
-      result = await script(page, Helpers);
+      result = await script(page, Helpers, args);
     } catch (e) {
       await browser.close();
       throw e;
