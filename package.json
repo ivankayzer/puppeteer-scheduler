@@ -9,9 +9,9 @@
     "typescript": "^5.4.5"
   },
   "scripts": {
-    "dev": "tsc --watch",
+    "dev": "rimraf ./dist/src && tsc --watch",
     "format": "npx prettier . --write",
-    "build": "tsc",
+    "build": "rimraf ./dist/src && tsc",
     "server": "node dist/src/server",
     "scheduler": "node dist/src/index"
   },
@@ -24,6 +24,7 @@
     "md5": "^2.3.0",
     "node-telegram-bot-api": "^0.65.1",
     "puppeteer": "^22.9.0",
-    "redis": "^4.6.13"
+    "redis": "^4.6.13",
+    "rimraf": "^5.0.7"
   }
 }

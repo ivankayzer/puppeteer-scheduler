@@ -1,9 +1,7 @@
-version: "3"
 services:
   server:
-    image: node:22.2.0-slim
+    build: .
     command: node dist/src/server.js
-    working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
     environment:
@@ -14,9 +12,8 @@ services:
       - scheduler-network
 
   scheduler:
-    image: node:22.2.0-slim
+    build: .
     command: node dist/src/index.js
-    working_dir: /usr/src/app
     volumes:
       - .:/usr/src/app
     environment:
