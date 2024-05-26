@@ -1,7 +1,8 @@
 services:
   server:
-    build: .
-    command: node dist/src/server.js
+    build: 
+      context: .
+      target: server
     volumes:
       - .:/usr/src/app
     environment:
@@ -12,8 +13,9 @@ services:
       - scheduler-network
 
   scheduler:
-    build: .
-    command: node dist/src/index.js
+    build:
+      context: .
+      target: scheduler
     volumes:
       - .:/usr/src/app
     environment:

@@ -8,7 +8,8 @@ on:
       - v*
 
 env:
-  IMAGE_NAME: puppeteer-scheduler
+  IMAGE_SERVER: puppeteer-server
+  IMAGE_SCHEDULER: puppeteer-scheduler
 
 jobs:
   push:
@@ -19,18 +20,25 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Build image
-        run: docker build . --file Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
+      - name: Build server image
+        run: |
+          docker build . --file Dockerfile --tag $IMAGE_SERVER --target=server --label "runnumber=${GITHUB_RUN_ID}"
+          docker build . --file Dockerfile --tag $IMAGE_SCHEDULER --target=scheduler --label "runnumber=${GITHUB_RUN_ID}"
       - name: Log in to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
       - name: Push image
         run: |
-          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          IMAGE_SERVER_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_SERVER
+          IMAGE_SCHEDULER_ID=ghcr.io/${{ github.repository_owner }}/$IMAGE_SCHEDULER
+          IMAGE_SERVER_ID=$(echo $IMAGE_SERVER_ID | tr '[A-Z]' '[a-z]')
+          IMAGE_SCHEDULER_ID=$(echo $IMAGE_SCHEDULER_ID | tr '[A-Z]' '[a-z]')
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
           [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
           [ "$VERSION" == "main" ] && VERSION=latest
-          echo IMAGE_ID=$IMAGE_ID
+          echo IMAGE_SERVER_ID=$IMAGE_SERVER_ID
+          echo IMAGE_SCHEDULER_ID=$IMAGE_SCHEDULER_ID
           echo VERSION=$VERSION
-          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-          docker push $IMAGE_ID:$VERSION
+          docker tag $IMAGE_SERVER $IMAGE_SERVER_ID:$VERSION
+          docker push $IMAGE_SERVER_ID:$VERSION
+          docker tag $IMAGE_SCHEDULER $IMAGE_SCHEDULER_ID:$VERSION
+          docker push $IMAGE_SCHEDULER_ID:$VERSION
