@@ -22,8 +22,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build server image
         run: |
-          docker build . --file Dockerfile --platform=linux/arm64/v8 --tag $IMAGE_SERVER --target=server --label "runnumber=${GITHUB_RUN_ID}"
-          docker build . --file Dockerfile --platform=linux/arm64/v8 --tag $IMAGE_SCHEDULER --target=scheduler --label "runnumber=${GITHUB_RUN_ID}"
+          docker build . --file Dockerfile --tag $IMAGE_SERVER --target=server --label "runnumber=${GITHUB_RUN_ID}"
+          docker build . --file Dockerfile --tag $IMAGE_SCHEDULER --target=scheduler --label "runnumber=${GITHUB_RUN_ID}"
       - name: Log in to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
       - name: Push image
